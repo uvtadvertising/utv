@@ -1,8 +1,8 @@
 export const contactDetails = [
   {
     label: "Email",
-    value: "uvtadvertising@gmail.com",
-    href: "mailto:uvtadvertising@gmail.com",
+    value: "info@uvtadvertising.co.uk",
+    href: "mailto:info@uvtadvertising.co.uk",
     icon: "mail" as const,
   },
   {

@@ -20,7 +20,7 @@ export const privacyPolicy: LegalPage = {
     {
       heading: "1. Who we are",
       paragraphs: [
-        "UVT Advertising is a digital marketing agency based in Stoke-on-Trent, serving businesses across Staffordshire. For privacy queries, contact us at uvtadvertising@gmail.com.",
+        "UVT Advertising is a digital marketing agency based in Stoke-on-Trent, serving businesses across Staffordshire. For privacy queries, contact us at info@uvtadvertising.co.uk",
       ],
     },
     {
@@ -62,7 +62,7 @@ export const privacyPolicy: LegalPage = {
     {
       heading: "6. Your rights",
       paragraphs: [
-        "Depending on applicable law (including UK GDPR), you may have rights to access, correct, delete, restrict, or object to processing of your personal data, and to request data portability. To exercise these rights, email uvtadvertising@gmail.com.",
+        "Depending on applicable law (including UK GDPR), you may have rights to access, correct, delete, restrict, or object to processing of your personal data, and to request data portability. To exercise these rights, email info@uvtadvertising.co.uk",
       ],
     },
     {
@@ -89,7 +89,7 @@ export const termsOfService: LegalPage = {
     {
       heading: "1. About UVT",
       paragraphs: [
-        "UVT Advertising provides websites, apps, design, SEO, and paid advertising for businesses in Stoke-on-Trent and across Staffordshire. Contact: uvtadvertising@gmail.com.",
+        "UVT Advertising provides websites, apps, design, SEO, and paid advertising for businesses in Stoke-on-Trent and across Staffordshire. Contact: info@uvtadvertising.co.uk",
       ],
     },
     {
@@ -188,7 +188,7 @@ export const cookiePolicy: LegalPage = {
     {
       heading: "6. Contact",
       paragraphs: [
-        "Questions about cookies or privacy: uvtadvertising@gmail.com.",
+        "Questions about cookies or privacy: info@uvtadvertising.co.uk",
       ],
     },
   ],
