@@ -88,7 +88,7 @@ export function Header() {
         )}
       >
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-4 md:px-8 lg:px-16">
-          <Link href="/" className="relative block h-9 w-[120px] shrink-0 sm:h-10 sm:w-[180px]" onClick={() => setOpen(false)}>
+          <Link href="/" className="relative block h-12 w-[140px] shrink-0 sm:h-14 sm:w-[220px]" onClick={() => setOpen(false)}>
             <Image src="/images/Logo.png" alt="UVT Advertising" fill priority className="object-contain object-left" sizes="200px" />
           </Link>
 
