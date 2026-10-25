@@ -13,7 +13,7 @@ const needs = [
   "Meta Ads (Facebook & Instagram)",
   "Microsoft Ads",
   "Full Digital Marketing Package",
-  "Not Sure Yet — Need Advice",
+  "Other",
 ];
 
 
