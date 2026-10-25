@@ -16,6 +16,17 @@ const needs = [
   "Not Sure Yet — Need Advice",
 ];
 
+
+const budgets = [
+  "Under $500",
+  "$500 – $1,000",
+  "$1,000 – $2,500",
+  "$2,500 – $5,000",
+  "$5,000 – $10,000",
+  "$10,000+",
+  "Not Sure Yet",
+];
+
 const sources = [
   "Google Search",
   "Google Ads",
@@ -29,25 +40,55 @@ const field =
   "w-full rounded-xl border border-card-border bg-navy/40 px-4 py-3 text-sm text-foreground outline-none placeholder:text-muted/70 focus:border-accent/50";
 
 export function ContactPageView() {
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
 
-  function onSubmit(e: FormEvent<HTMLFormElement>) {
+  const [feedback, setFeedback] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    const lines = [
-      `Name: ${data.get("name")}`,
-      `Business: ${data.get("business") || "—"}`,
-      `Email: ${data.get("email")}`,
-      `Phone: ${data.get("phone")}`,
-      `Help with: ${data.get("need")}`,
-      `Heard about us: ${data.get("source") || "—"}`,
-      "",
-      String(data.get("message") || ""),
-    ];
-    window.location.href = `mailto:${agency.email}?subject=${encodeURIComponent(
-      "Website enquiry",
-    )}&body=${encodeURIComponent(lines.join("\n"))}`;
-    setSent(true);
+
+    const form = e.currentTarget;
+    const data = new FormData(form);
+
+    const payload = {
+      name: String(data.get("name") || ""),
+      budget: String(data.get("budget") || ""),
+      email: String(data.get("email") || ""),
+      phone: String(data.get("phone") || ""),
+      need: String(data.get("need") || ""),
+      source: String(data.get("source") || ""),
+      message: String(data.get("message") || ""),
+    };
+
+    setStatus("loading");
+    setFeedback("");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Email could not be sent.");
+      }
+
+      setStatus("success");
+      setFeedback("");
+      form.reset();
+      setShowSuccessModal(true);
+    } catch {
+      setStatus("error");
+      setFeedback("Message could not be sent. Please try again.");
+    }
   }
 
   return (
@@ -57,7 +98,7 @@ export function ContactPageView() {
           <p className="text-[11px] font-semibold tracking-[0.14em] text-accent">CONTACT</p>
           <h1 className="mt-4 text-4xl font-extrabold text-foreground sm:text-5xl">Get in Touch</h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
-            Ready to grow your business online? Tell us what you need. We will give you a free, no-obligation quote — usually within 24 hours.
+            Ready to grow your business online? Tell us what you need. We will give you a free, no-obligation quote usually within 24 hours.
           </p>
 
           <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
@@ -67,9 +108,15 @@ export function ContactPageView() {
               <p className="mt-2 text-sm text-muted">
                 Fill in the form below and we will get back to you as soon as possible. No pushy sales calls. No pressure. Just a straight answer about how we can help.
               </p>
-              {sent && (
-                <p className="mt-4 rounded-xl bg-accent/10 px-4 py-3 text-sm text-accent">
-                  Opening your email app. If nothing opens, email {agency.email} directly.
+              {feedback && (
+                <p
+                  role={status === "error" ? "alert" : "status"}
+                  className={`mt-4 rounded-xl px-4 py-3 text-sm ${status === "error"
+                    ? "bg-red-500/10 text-red-400"
+                    : "bg-accent/10 text-accent"
+                    }`}
+                >
+                  {feedback}
                 </p>
               )}
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -77,10 +124,7 @@ export function ContactPageView() {
                   Your Name *
                   <input name="name" required className={`${field} mt-1.5`} />
                 </label>
-                <label className="block text-xs font-semibold text-muted">
-                  Business Name (optional)
-                  <input name="business" className={`${field} mt-1.5`} />
-                </label>
+
                 <label className="block text-xs font-semibold text-muted">
                   Email Address *
                   <input name="email" type="email" required className={`${field} mt-1.5`} />
@@ -88,6 +132,25 @@ export function ContactPageView() {
                 <label className="block text-xs font-semibold text-muted">
                   Phone Number *
                   <input name="phone" required className={`${field} mt-1.5`} />
+                </label>
+                <label className="block text-xs font-semibold text-muted">
+                  Estimated Project Budget *
+                  <select
+                    name="budget"
+                    required
+                    defaultValue=""
+                    className={`${field} mt-1.5`}
+                  >
+                    <option value="" disabled>
+                      Select your budget
+                    </option>
+
+                    {budgets.map((budget) => (
+                      <option key={budget} value={budget}>
+                        {budget}
+                      </option>
+                    ))}
+                  </select>
                 </label>
               </div>
               <label className="mt-4 block text-xs font-semibold text-muted">
@@ -111,8 +174,12 @@ export function ContactPageView() {
                   ))}
                 </select>
               </label>
-              <button type="submit" className="mt-6 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-white">
-                Send Message
+              <button
+                type="submit"
+                disabled={status === "loading"}
+                className="mt-6 rounded-xl bg-accent px-5 py-3 text-sm cursor-pointer font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {status === "loading" ? "Sending..." : "Send Message"}
               </button>
               <p className="mt-3 text-xs text-muted">
                 We reply to every message. If you do not hear from us within 24 hours, please email us directly.
@@ -241,6 +308,83 @@ export function ContactPageView() {
           </a>
         </div>
       </section>
+
+
+      {showSuccessModal && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
+          onClick={() => setShowSuccessModal(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-[#101d35] px-6 py-8 text-center shadow-[0_25px_80px_rgba(0,0,0,0.5)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close */}
+            <button
+              type="button"
+              onClick={() => setShowSuccessModal(false)}
+              aria-label="Close"
+              className="absolute right-4 top-4 flex size-8 items-center justify-center cursor-pointer rounded-full text-slate-400 transition hover:bg-white/10 hover:text-white"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="size-5"
+              >
+                <path
+                  d="M18 6 6 18M6 6l12 12"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+
+            {/* Success Icon */}
+            <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-full bg-emerald-400/10">
+              <div className="flex size-10 items-center justify-center rounded-full bg-emerald-400/15">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="size-6 text-emerald-400"
+                >
+                  <path d="m5 12 4 4L19 6" />
+                </svg>
+              </div>
+            </div>
+
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-sky-400">
+              Message Received
+            </p>
+
+            <h2 className="mt-2 text-2xl font-extrabold text-white">
+              Thank You!
+            </h2>
+
+            <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-slate-300">
+              Your enquiry has been sent successfully. Our team will
+              get back to you within 24 hours.
+            </p>
+
+            <div className="mx-auto mt-5 h-px w-24 bg-white/10" />
+
+            <p className="mt-4 text-xs text-slate-500">
+              We look forward to working with you.
+            </p>
+
+            <p className="mt-5 text-[9px] font-bold tracking-[0.22em] text-slate-600">
+              UVT ADVERTISING
+            </p>
+          </div>
+        </div>
+      )}
+
     </>
   );
 }
