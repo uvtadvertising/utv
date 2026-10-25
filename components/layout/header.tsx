@@ -88,8 +88,8 @@ export function Header() {
         )}
       >
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-4 md:px-8 lg:px-16">
-          <Link href="/" className="relative block h-12 w-[140px] shrink-0 sm:h-14 sm:w-[220px]" onClick={() => setOpen(false)}>
-            <Image src="/images/Logo.png" alt="UVT Advertising" fill priority className="object-contain object-left" sizes="200px" />
+          <Link href="/" className="relative block h-18 w-[200px] shrink-0 sm:h-20 sm:w-[300px]" onClick={() => setOpen(false)}>
+            <Image src="/images/Logo.png" alt="UVT Advertising" fill priority className="object-contain object-left" sizes="240px" />
           </Link>
 
           <nav className="hidden items-center gap-1 rounded-full border border-white/8 bg-white/[0.04] p-1.5 lg:flex" aria-label="Primary">
