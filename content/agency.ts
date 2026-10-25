@@ -1,6 +1,6 @@
 export const agency = {
   name: "UVT Advertising",
-  email: "uvtadvertising@gmail.com",
+  email: "info@uvtadvertising.co.uk",
   location: "Stoke-on-Trent, Staffordshire",
   address: "12 Example Street, Hanley, Stoke-on-Trent, ST1 1AA",
   whatsapp: "+44 7700 900123",
