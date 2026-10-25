@@ -137,15 +137,6 @@ export function Header() {
                         )}
                       </AnimatePresence>
                     </div>
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "rounded-full px-4 py-2 text-sm font-medium",
-                        isActive(pathname, item.href) ? "bg-white/10 text-foreground" : "text-muted hover:bg-white/5 hover:text-foreground",
-                      )}
-                    >
-                      {item.label}
-                    </Link>
                   </div>
                 );
               }
