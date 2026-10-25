@@ -1,4 +1,4 @@
-// for run
+// for run script
 // node scripts/check-testmail.js
 
 import dotenv from "dotenv";
