@@ -44,7 +44,9 @@ export async function sendContactEmail(input: ContactEmail) {
 
   const name = escapeHtml(input.name);
   const email = escapeHtml(input.email);
-  const budget = escapeHtml(input.budget || "Not specified");
+  const budget = input.budget
+  ? `£${Number(input.budget).toLocaleString("en-GB")}`
+  : "Not specified";
   const phone = escapeHtml(input.phone || "Not provided");
   const service = escapeHtml(input.need || input.subject || "General enquiry");
   const source = escapeHtml(input.source || "Not specified");
@@ -232,7 +234,7 @@ export async function sendContactEmail(input: ContactEmail) {
     `Name: ${input.name}`,
     `Email: ${input.email}`,
     `Phone: ${input.phone || "Not provided"}`,
-    `Project Budget: ${input.budget || "Not specified"}`,
+    `Project Budget: ${budget}`,
     `Service Required: ${input.need || input.subject || "General enquiry"}`,
     `Lead Source: ${input.source || "Not specified"}`,
     "",

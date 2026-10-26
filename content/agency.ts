@@ -3,7 +3,7 @@ export const agency = {
   email: "info@uvtadvertising.co.uk",
   location: "Stoke-on-Trent, Staffordshire",
   address: "12 Example Street, Hanley, Stoke-on-Trent, ST1 1AA",
-  whatsapp: "+44 7700 900123",
+  whatsapp: "+44 7424 288711",
   whatsappHref: "https://wa.me/447700900123",
   hours: "Monday to Friday, 9am – 6pm",
   tagline: "Digital Marketing Agency in Stoke-on-Trent",

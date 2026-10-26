@@ -16,17 +16,6 @@ const needs = [
   "Other",
 ];
 
-
-const budgets = [
-  "Under £500",
-  "£500 – £1,000",
-  "£1,000 – £2,500",
-  "£2,500 – £5,000",
-  "£5,000 – £10,000",
-  "£10,000+",
-  "Not Sure Yet",
-];
-
 const sources = [
   "Google Search",
   "Google Ads",
@@ -122,35 +111,34 @@ export function ContactPageView() {
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <label className="block text-xs font-semibold text-muted">
                   Your Name *
-                  <input name="name" required className={`${field} mt-1.5`} />
+                  <input name="name" required className={`${field} mt-1.5`} placeholder="Jhon" />
                 </label>
 
                 <label className="block text-xs font-semibold text-muted">
                   Email Address *
-                  <input name="email" type="email" required className={`${field} mt-1.5`} />
+                  <input name="email" type="email" required className={`${field} mt-1.5`} placeholder="jhon@gmail.com" />
                 </label>
                 <label className="block text-xs font-semibold text-muted">
                   Phone Number *
-                  <input name="phone" required className={`${field} mt-1.5`} />
+                  <input name="phone" required className={`${field} mt-1.5`} placeholder="+44 7700 123456" />
                 </label>
                 <label className="block text-xs font-semibold text-muted">
-                  Estimated Project Budget *
-                  <select
-                    name="budget"
-                    required
-                    defaultValue=""
-                    className={`${field} mt-1.5`}
-                  >
-                    <option value="" disabled>
-                      Select your budget
-                    </option>
+                  Estimated Project Budget (£) *
+                  <div className="relative mt-1.5">
+                    <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-sm font-semibold text-muted">
+                      £
+                    </span>
 
-                    {budgets.map((budget) => (
-                      <option key={budget} value={budget}>
-                        {budget}
-                      </option>
-                    ))}
-                  </select>
+                    <input
+                      type="number"
+                      name="budget"
+                      required
+                      min="1"
+                      step="1"
+                      placeholder="Enter your estimated budget"
+                      className={`${field} pl-9`}
+                    />
+                  </div>
                 </label>
               </div>
               <label className="mt-4 block text-xs font-semibold text-muted">
@@ -163,7 +151,7 @@ export function ContactPageView() {
               </label>
               <label className="mt-4 block text-xs font-semibold text-muted">
                 Tell us about your project *
-                <textarea name="message" required rows={5} className={`${field} mt-1.5`} />
+                <textarea name="message" required rows={5} className={`${field} mt-1.5`} placeholder="Briefly describe your project..." />
               </label>
               <label className="mt-4 block text-xs font-semibold text-muted">
                 How did you hear about us? (optional)
