@@ -134,12 +134,7 @@ export function Footer() {
                 </span>
                 {footerBrand.whatsapp}
               </a>
-              <p className="flex items-start gap-2.5 rounded-xl px-2.5 py-2 text-sm text-muted">
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent-end/10 text-accent-end">
-                  <PinIcon className="size-3.5" />
-                </span>
-                {footerBrand.address}
-              </p>
+              
             </div>
 
             <div className="mt-4 flex flex-wrap gap-2 px-2.5">

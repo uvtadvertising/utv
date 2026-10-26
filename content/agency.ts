@@ -4,7 +4,7 @@ export const agency = {
   location: "Stoke-on-Trent, Staffordshire",
   address: "12 Example Street, Hanley, Stoke-on-Trent, ST1 1AA",
   whatsapp: "+44 7424 288711",
-  whatsappHref: "https://wa.me/447700900123",
+  whatsappHref: "https://wa.me/447424288711",
   hours: "Monday to Friday, 9am – 6pm",
   tagline: "Digital Marketing Agency in Stoke-on-Trent",
   serving: "Serving Businesses Across Staffordshire",
