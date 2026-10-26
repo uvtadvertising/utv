@@ -18,12 +18,12 @@ const needs = [
 
 
 const budgets = [
-  "Under $500",
-  "$500 – $1,000",
-  "$1,000 – $2,500",
-  "$2,500 – $5,000",
-  "$5,000 – $10,000",
-  "$10,000+",
+  "Under £500",
+  "£500 – £1,000",
+  "£1,000 – £2,500",
+  "£2,500 – £5,000",
+  "£5,000 – £10,000",
+  "£10,000+",
   "Not Sure Yet",
 ];
 
@@ -200,7 +200,6 @@ export function ContactPageView() {
               </div>
               <div className="rounded-2xl border border-card-border bg-card p-5 text-sm text-muted">
                 <p className="font-semibold text-foreground">Address</p>
-                <p className="mt-1">{agency.address}</p>
                 <p>Serving businesses across Staffordshire and the UK</p>
                 <p className="mt-2">{agency.hours}</p>
               </div>

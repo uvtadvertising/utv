@@ -9,8 +9,8 @@ export const agency = {
   tagline: "Digital Marketing Agency in Stoke-on-Trent",
   serving: "Serving Businesses Across Staffordshire",
   socials: [
-    { label: "Facebook", href: "https://facebook.com/uvtadvertising" },
-    { label: "Instagram", href: "https://instagram.com/uvtadvertising" },
+    { label: "Facebook", href: "https://www.facebook.com/share/1FY53EeboZ/?mibextid=wwXIfr" },
+    { label: "Instagram", href: "https://www.instagram.com/uvtadvertising?dlrf=cmlza3d2NXM5c291" },
     { label: "LinkedIn", href: "https://linkedin.com/company/uvtadvertising" },
   ],
 } as const;
