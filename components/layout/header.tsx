@@ -23,6 +23,9 @@ const navIcons: Record<string, ReactNode> = {
   "/portfolio": (
     <path d="M4 8h16v11H4V8zm3-4h10l1 4H6l1-4z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
   ),
+  "/blog": (
+    <path d="M6 4h12v16H6V4zm3 4h6M9 12h6M9 16h4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+  ),
   "/faq": (
     <path d="M12 17h.01M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
   ),
