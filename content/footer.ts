@@ -16,6 +16,7 @@ export const footerServices = serviceLinks;
 export const footerCompany = [
   { label: "About Us", href: "/about" },
   { label: "Portfolio", href: "/portfolio" },
+  { label: "Blog", href: "/blog" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
   ...serviceAreas,
