@@ -1,28 +1,77 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
-import Link from "next/link";
+import { useActionState, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { RichEditor } from "@/components/admin/rich-editor";
 import { uploadBlogImage } from "@/lib/blog-images";
-import { BLOG_CATEGORIES, blogProgress, slugify } from "@/lib/blogs";
-import { createBlog, type CreateBlogState } from "../actions";
+import {
+  BLOG_CATEGORIES,
+  blogProgress,
+  hasDraftContent,
+  slugify,
+  type Blog,
+} from "@/lib/blogs";
+import { createClient } from "@/lib/supabase/client";
+import {
+  publishBlog,
+  type BlogActionState,
+} from "@/app/admin/dashboard/blogs/actions";
 
 const field =
   "w-full rounded-xl border border-card-border bg-navy/40 px-4 py-3 text-sm text-foreground outline-none placeholder:text-muted/70 focus:border-accent/50";
 
-const initialState: CreateBlogState = {};
+const initialState: BlogActionState = {};
 const EXCERPT_MAX = 180;
 
-export function BlogForm() {
-  const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
-  const [slugTouched, setSlugTouched] = useState(false);
-  const [excerpt, setExcerpt] = useState("");
-  const [content, setContent] = useState("");
-  const [category, setCategory] = useState("");
-  const [coverImageUrl, setCoverImageUrl] = useState("");
+type BlogFormProps = {
+  blog?: Blog;
+};
+
+export function BlogForm({ blog }: BlogFormProps) {
+  const router = useRouter();
+  const [id, setId] = useState(blog?.id || "");
+  const [title, setTitle] = useState(
+    blog?.title === "Untitled draft" ? "" : blog?.title || "",
+  );
+  const [slug, setSlug] = useState(
+    blog?.slug?.startsWith("draft-") && blog?.title === "Untitled draft"
+      ? ""
+      : blog?.slug || "",
+  );
+  const [slugTouched, setSlugTouched] = useState(
+    Boolean(blog?.slug && !blog.slug.startsWith("draft-")),
+  );
+  const [excerpt, setExcerpt] = useState(blog?.excerpt || "");
+  const [content, setContent] = useState(blog?.content || "");
+  const [category, setCategory] = useState(blog?.category || "");
+  const [coverImageUrl, setCoverImageUrl] = useState(blog?.cover_image_url || "");
   const [uploadingCover, setUploadingCover] = useState(false);
-  const [state, formAction, pending] = useActionState(createBlog, initialState);
+  const [leaving, setLeaving] = useState(false);
+  const [publishState, publishAction, publishing] = useActionState(
+    publishBlog,
+    initialState,
+  );
+
+  const valuesRef = useRef({
+    id,
+    title,
+    slug,
+    excerpt,
+    content,
+    coverImageUrl,
+    category,
+  });
+  const publishedRef = useRef(false);
+
+  valuesRef.current = {
+    id,
+    title,
+    slug,
+    excerpt,
+    content,
+    coverImageUrl,
+    category,
+  };
 
   const progress = useMemo(
     () =>
@@ -36,6 +85,95 @@ export function BlogForm() {
       }),
     [title, slug, excerpt, content, coverImageUrl, category],
   );
+
+  const persistDraft = useCallback(async () => {
+    if (publishedRef.current) return null;
+
+    const current = valuesRef.current;
+    if (
+      !hasDraftContent({
+        title: current.title,
+        slug: current.slug,
+        excerpt: current.excerpt,
+        content: current.content,
+        coverImageUrl: current.coverImageUrl,
+        category: current.category,
+      })
+    ) {
+      return null;
+    }
+
+    const supabase = createClient();
+    const fromInput = slugify(current.slug || current.title);
+    const nextSlug =
+      fromInput ||
+      (current.id ? undefined : `draft-${crypto.randomUUID().slice(0, 8)}`);
+
+    const row: Record<string, string | null> = {
+      title: current.title || "Untitled draft",
+      excerpt: current.excerpt,
+      content: current.content,
+      cover_image_url: current.coverImageUrl || null,
+      category: current.category,
+      status: "draft",
+      updated_at: new Date().toISOString(),
+    };
+
+    if (nextSlug) row.slug = nextSlug;
+
+    if (current.id) {
+      const { error } = await supabase.from("blogs").update(row).eq("id", current.id);
+      if (error) throw new Error(error.message);
+      return current.id;
+    }
+
+    if (!row.slug) {
+      row.slug = `draft-${crypto.randomUUID().slice(0, 8)}`;
+    }
+
+    const { data, error } = await supabase
+      .from("blogs")
+      .insert(row)
+      .select("id")
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    valuesRef.current.id = data.id;
+    setId(data.id);
+    return data.id as string;
+  }, []);
+
+  // Only save draft when the user actually leaves the page (not while typing).
+  useEffect(() => {
+    function onLeave() {
+      if (publishedRef.current) return;
+      void persistDraft();
+    }
+
+    function onVisibility() {
+      if (document.visibilityState === "hidden") onLeave();
+    }
+
+    window.addEventListener("pagehide", onLeave);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("pagehide", onLeave);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [persistDraft]);
+
+  async function goBack() {
+    setLeaving(true);
+    try {
+      await persistDraft();
+      router.push("/admin/dashboard");
+      router.refresh();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Draft could not be saved.");
+      setLeaving(false);
+    }
+  }
 
   async function onCoverChange(file: File | undefined) {
     if (!file) return;
@@ -51,10 +189,7 @@ export function BlogForm() {
   }
 
   return (
-    <form action={formAction} className="grid gap-8 lg:grid-cols-[1.45fr_0.75fr]">
-      <input type="hidden" name="content" value={content} />
-      <input type="hidden" name="cover_image_url" value={coverImageUrl} />
-
+    <div className="grid gap-8 lg:grid-cols-[1.45fr_0.75fr]">
       <div className="space-y-6">
         <div className="rounded-2xl border border-card-border bg-card p-5 sm:p-6">
           <p className="text-[11px] font-semibold tracking-[0.14em] text-accent uppercase">
@@ -68,7 +203,6 @@ export function BlogForm() {
               </label>
               <input
                 id="title"
-                name="title"
                 value={title}
                 onChange={(e) => {
                   const next = e.target.value;
@@ -77,7 +211,6 @@ export function BlogForm() {
                 }}
                 className={field}
                 placeholder="Write a clear, specific title"
-                required
               />
             </div>
 
@@ -87,7 +220,6 @@ export function BlogForm() {
               </label>
               <input
                 id="slug"
-                name="slug"
                 value={slug}
                 onChange={(e) => {
                   setSlugTouched(true);
@@ -95,7 +227,6 @@ export function BlogForm() {
                 }}
                 className={field}
                 placeholder="url-friendly-slug"
-                required
               />
               <p className="mt-2 text-xs text-muted">/blog/{slug || "your-slug"}</p>
             </div>
@@ -110,7 +241,7 @@ export function BlogForm() {
             Use headings, lists, quotes, links, and images to structure the article.
           </p>
           <div className="mt-4">
-            <RichEditor onChange={setContent} />
+            <RichEditor initialHtml={blog?.content || ""} onChange={setContent} />
           </div>
         </div>
       </div>
@@ -128,7 +259,7 @@ export function BlogForm() {
             />
           </div>
           <p className="mt-3 text-xs text-muted">
-            Fill title, slug, content, cover, category, and short description.
+            Nothing is saved until you publish, or leave with Back.
           </p>
         </div>
 
@@ -172,11 +303,9 @@ export function BlogForm() {
             </label>
             <select
               id="category"
-              name="category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className={field}
-              required
             >
               <option value="">Select category</option>
               {BLOG_CATEGORIES.map((item) => (
@@ -198,40 +327,53 @@ export function BlogForm() {
             </div>
             <textarea
               id="excerpt"
-              name="excerpt"
               value={excerpt}
               maxLength={EXCERPT_MAX}
               onChange={(e) => setExcerpt(e.target.value)}
               rows={4}
               className={`${field} resize-y`}
               placeholder="Shown under the blog title on cards and article pages"
-              required
             />
           </div>
         </div>
 
-        {state.error ? (
+        {publishState.error ? (
           <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-            {state.error}
+            {publishState.error}
           </p>
         ) : null}
 
-        <div className="flex gap-3">
-          <Link
-            href="/admin/dashboard"
-            className="rounded-xl border border-card-border px-4 py-3 text-sm font-medium text-foreground transition hover:border-accent/40"
+        <form
+          action={(formData) => {
+            publishedRef.current = true;
+            publishAction(formData);
+          }}
+          className="flex gap-3"
+        >
+          {id ? <input type="hidden" name="id" value={id} /> : null}
+          <input type="hidden" name="title" value={title} />
+          <input type="hidden" name="slug" value={slug} />
+          <input type="hidden" name="excerpt" value={excerpt} />
+          <input type="hidden" name="content" value={content} />
+          <input type="hidden" name="cover_image_url" value={coverImageUrl} />
+          <input type="hidden" name="category" value={category} />
+          <button
+            type="button"
+            onClick={() => void goBack()}
+            disabled={leaving || publishing}
+            className="rounded-xl border border-card-border px-4 py-3 text-sm font-medium text-foreground transition hover:border-accent/40 disabled:opacity-60"
           >
-            Cancel
-          </Link>
+            {leaving ? "Saving…" : "Back"}
+          </button>
           <button
             type="submit"
-            disabled={pending || uploadingCover || progress < 100}
+            disabled={publishing || uploadingCover || leaving || progress < 100}
             className="btn-gradient flex-1 rounded-xl px-5 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {pending ? "Saving…" : "Save blog"}
+            {publishing ? "Publishing…" : "Publish"}
           </button>
-        </div>
+        </form>
       </aside>
-    </form>
+    </div>
   );
 }

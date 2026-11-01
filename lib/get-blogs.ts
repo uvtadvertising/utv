@@ -10,8 +10,9 @@ export async function getBlogs(filters?: {
   let query = supabase
     .from("blogs")
     .select(
-      "id, title, slug, excerpt, content, cover_image_url, category, created_at, updated_at",
+      "id, title, slug, excerpt, content, cover_image_url, category, status, created_at, updated_at",
     )
+    .eq("status", "published")
     .order("created_at", { ascending: false });
 
   if (filters?.category) {
@@ -39,9 +40,10 @@ export async function getBlogBySlug(slug: string) {
   const { data, error } = await supabase
     .from("blogs")
     .select(
-      "id, title, slug, excerpt, content, cover_image_url, category, created_at, updated_at",
+      "id, title, slug, excerpt, content, cover_image_url, category, status, created_at, updated_at",
     )
     .eq("slug", slug)
+    .eq("status", "published")
     .maybeSingle();
 
   if (error) {
@@ -57,8 +59,9 @@ export async function getRecentBlogs(excludeSlug: string, limit = 3) {
   const { data, error } = await supabase
     .from("blogs")
     .select(
-      "id, title, slug, excerpt, content, cover_image_url, category, created_at, updated_at",
+      "id, title, slug, excerpt, content, cover_image_url, category, status, created_at, updated_at",
     )
+    .eq("status", "published")
     .neq("slug", excludeSlug)
     .order("created_at", { ascending: false })
     .limit(limit);
@@ -80,8 +83,9 @@ export async function getRelatedBlogs(
   const { data, error } = await supabase
     .from("blogs")
     .select(
-      "id, title, slug, excerpt, content, cover_image_url, category, created_at, updated_at",
+      "id, title, slug, excerpt, content, cover_image_url, category, status, created_at, updated_at",
     )
+    .eq("status", "published")
     .eq("category", category)
     .neq("slug", excludeSlug)
     .order("created_at", { ascending: false })

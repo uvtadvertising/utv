@@ -2,21 +2,27 @@
 
 create table if not exists public.blogs (
   id uuid primary key default gen_random_uuid(),
-  title text not null,
+  title text not null default 'Untitled draft',
   slug text not null unique,
   excerpt text not null default '',
   content text not null default '',
   cover_image_url text,
-  category text not null,
+  category text not null default '',
+  status text not null default 'draft' check (status in ('draft', 'published')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 alter table public.blogs enable row level security;
 
-create policy "Public can read blogs"
+create policy "Anon can read published blogs"
   on public.blogs for select
-  to anon, authenticated
+  to anon
+  using (status = 'published');
+
+create policy "Authenticated can read all blogs"
+  on public.blogs for select
+  to authenticated
   using (true);
 
 create policy "Authenticated can insert blogs"

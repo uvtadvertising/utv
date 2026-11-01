@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { uploadBlogImage } from "@/lib/blog-images";
 
 type RichEditorProps = {
+  initialHtml?: string;
   onChange: (html: string) => void;
 };
 
@@ -32,9 +33,16 @@ function Divider() {
   return <span className="mx-0.5 h-5 w-px bg-card-border" aria-hidden />;
 }
 
-export function RichEditor({ onChange }: RichEditorProps) {
+export function RichEditor({ initialHtml = "", onChange }: RichEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const primed = useRef(false);
+
+  useEffect(() => {
+    if (!editorRef.current || primed.current) return;
+    editorRef.current.innerHTML = initialHtml;
+    primed.current = true;
+  }, [initialHtml]);
 
   function sync() {
     onChange(editorRef.current?.innerHTML || "");

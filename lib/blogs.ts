@@ -8,6 +8,8 @@ export const BLOG_CATEGORIES = [
 
 export type BlogCategory = (typeof BLOG_CATEGORIES)[number];
 
+export type BlogStatus = "draft" | "published";
+
 export type Blog = {
   id: string;
   title: string;
@@ -16,9 +18,31 @@ export type Blog = {
   content: string;
   cover_image_url: string | null;
   category: string;
+  status: BlogStatus;
   created_at: string;
   updated_at: string;
 };
+
+export type BlogInput = {
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  coverImageUrl: string;
+  category: string;
+};
+
+export function hasDraftContent(fields: BlogInput) {
+  return Boolean(
+    fields.title.trim() ||
+      fields.slug.trim() ||
+      fields.excerpt.trim() ||
+      fields.content.replace(/<[^>]*>/g, "").trim() ||
+      fields.content.includes("<img") ||
+      fields.coverImageUrl.trim() ||
+      fields.category.trim(),
+  );
+}
 
 export const BLOG_PAGE_SIZE = 6;
 
