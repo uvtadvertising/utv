@@ -173,7 +173,9 @@ export function Footer() {
         <div className="mt-12 flex flex-col gap-4 border-t border-card-border pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs leading-relaxed text-muted sm:text-[13px]">
             © {year} UVT Advertising. Digital marketing agency in
-            Stoke-on-Trent, serving businesses across Staffordshire.
+            Stoke-on-Trent, serving businesses across Staffordshire. UVT
+            Advertising is a trading name of UVT LTD, a company registered in
+            England and Wales. Company Registration Number: 15181622.
           </p>
           <div className="flex flex-wrap gap-x-1 gap-y-1">
             {footerLegal.map((item) => (

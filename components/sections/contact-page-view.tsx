@@ -111,12 +111,12 @@ export function ContactPageView() {
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <label className="block text-xs font-semibold text-muted">
                   Your Name *
-                  <input name="name" required className={`${field} mt-1.5`} placeholder="Jhon" />
+                  <input name="name" required className={`${field} mt-1.5`} placeholder="John" />
                 </label>
 
                 <label className="block text-xs font-semibold text-muted">
                   Email Address *
-                  <input name="email" type="email" required className={`${field} mt-1.5`} placeholder="jhon@gmail.com" />
+                  <input name="email" type="email" required className={`${field} mt-1.5`} placeholder="john@gmail.com" />
                 </label>
                 <label className="block text-xs font-semibold text-muted">
                   Phone Number *
