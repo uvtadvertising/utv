@@ -19,6 +19,10 @@ export const footerCompany = [
   { label: "Blog", href: "/blog" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
+  {
+    label: "Community Initiative",
+    href: "/charity-digital-support-staffordshire",
+  },
   ...serviceAreas,
 ] as const;
 

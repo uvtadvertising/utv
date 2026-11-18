@@ -251,3 +251,101 @@ export async function sendContactEmail(input: ContactEmail) {
     text,
   });
 }
+
+type CommunityEmail = {
+  organisationName: string;
+  contactName: string;
+  email: string;
+  website?: string;
+  organisationType: string;
+  location: string;
+  supportOption: string;
+  needs: string;
+};
+
+export async function sendCommunityInterestEmail(input: CommunityEmail) {
+  const recipients = process.env.CONTACT_TO_EMAIL
+    ?.split(",")
+    .map((email) => email.trim())
+    .filter(Boolean);
+  const sender = process.env.CONTACT_FROM_EMAIL;
+
+  if (!recipients?.length || !sender || !process.env.RESEND_API_KEY) {
+    throw new Error("Email environment variables are missing.");
+  }
+
+  const organisationName = escapeHtml(input.organisationName);
+  const contactName = escapeHtml(input.contactName);
+  const email = escapeHtml(input.email);
+  const website = escapeHtml(input.website || "Not provided");
+  const organisationType = escapeHtml(input.organisationType);
+  const location = escapeHtml(input.location);
+  const supportOption = escapeHtml(input.supportOption);
+  const needs = escapeHtml(input.needs).replace(/\r?\n/g, "<br />");
+
+  const row = (label: string, value: string) => `
+    <tr>
+      <td style="padding:13px 0;color:#64748b;font-size:13px;border-bottom:1px solid #edf2f7;width:160px;vertical-align:top;">
+        ${label}
+      </td>
+      <td style="padding:13px 0;color:#172b4d;font-size:14px;font-weight:600;border-bottom:1px solid #edf2f7;vertical-align:top;word-break:break-word;">
+        ${value}
+      </td>
+    </tr>
+  `;
+
+  const html = `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head><meta charset="UTF-8" /><title>Community Programme Interest</title></head>
+  <body style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif;color:#172b4d;">
+    <div style="max-width:640px;margin:32px auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0;">
+      <div style="background:#0D2244;padding:28px 32px;">
+        <p style="margin:0;color:#7ec8a3;font-size:12px;letter-spacing:0.12em;font-weight:700;">COMMUNITY INITIATIVE</p>
+        <h1 style="margin:10px 0 0;color:#ffffff;font-size:22px;">New Expression of Interest</h1>
+      </div>
+      <div style="padding:28px 32px;">
+        <table style="width:100%;border-collapse:collapse;">
+          ${row("Organisation", organisationName)}
+          ${row("Contact person", contactName)}
+          ${row("Email", email)}
+          ${row("Website", website)}
+          ${row("Organisation type", organisationType)}
+          ${row("Area served", location)}
+          ${row("Support option", supportOption)}
+        </table>
+        <div style="margin-top:24px;">
+          <p style="margin:0 0 8px;color:#64748b;font-size:13px;">Needs</p>
+          <p style="margin:0;color:#172b4d;font-size:14px;line-height:1.6;">${needs}</p>
+        </div>
+      </div>
+    </div>
+  </body>
+  </html>`;
+
+  const text = [
+    "UVT COMMUNITY DIGITAL SUPPORT PROGRAMME",
+    "New Expression of Interest",
+    "",
+    `Organisation: ${input.organisationName}`,
+    `Contact person: ${input.contactName}`,
+    `Email: ${input.email}`,
+    `Website: ${input.website || "Not provided"}`,
+    `Organisation type: ${input.organisationType}`,
+    `Area served: ${input.location}`,
+    `Support option: ${input.supportOption}`,
+    "",
+    "Needs:",
+    input.needs,
+  ].join("\n");
+
+  return resend.emails.send({
+    from: sender,
+    to: recipients,
+    replyTo: input.email,
+    subject: `Community Initiative EOI | ${input.organisationName} | UVT Advertising`,
+    html,
+    text,
+  });
+}
+

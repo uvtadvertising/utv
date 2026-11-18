@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowIcon } from "@/components/icons/arrow";
+import { CommunityInitiative } from "@/components/sections/community-initiative";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -228,6 +229,8 @@ export function HomeBody() {
           </div>
         </div>
       </section>
+
+      <CommunityInitiative />
 
       <section className="bg-background py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-5 md:px-8 lg:px-16">
