@@ -39,31 +39,36 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
   ]);
 
   return (
-    <article className="bg-background pb-20 pt-28 md:pb-24 md:pt-32">
-      <div className="mx-auto max-w-6xl px-5 md:px-8 lg:px-12">
-        <Link href="/blog" className="text-sm text-muted hover:text-accent">
+    <article className="relative overflow-hidden bg-background pb-20 pt-28 md:pb-24 md:pt-32">
+      <div className="pointer-events-none absolute -left-24 top-40 size-[380px] rounded-full bg-accent/10 blur-[120px]" />
+      <div className="pointer-events-none absolute -right-20 top-[28rem] size-[320px] rounded-full bg-accent-end/10 blur-[110px]" />
+
+      <div className="relative mx-auto max-w-6xl px-5 md:px-8 lg:px-12">
+        <Link href="/blog" className="text-sm text-muted transition hover:text-accent">
           ← Back to blog
         </Link>
 
-        <p className="mt-8 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-          <span className="font-semibold tracking-[0.12em] text-accent uppercase">
-            {blog.category}
-          </span>
-          <span className="text-muted">
-            {formatBlogDate(blog.created_at)} · {estimateReadTime(blog.content)}{" "}
-            MIN READ
-          </span>
-        </p>
+        <header className="mt-8 max-w-4xl">
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+            <span className="rounded-full border border-accent/25 bg-accent/10 px-3 py-1 font-semibold tracking-[0.12em] text-accent uppercase">
+              {blog.category}
+            </span>
+            <span className="text-muted">
+              {formatBlogDate(blog.created_at)} · {estimateReadTime(blog.content)}{" "}
+              MIN READ
+            </span>
+          </p>
 
-        <h1 className="mt-4 max-w-4xl text-3xl font-extrabold leading-tight tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-          {blog.title}
-        </h1>
-        <p className="mt-4 max-w-3xl text-base leading-relaxed text-muted sm:text-lg">
-          {blog.excerpt}
-        </p>
+          <h1 className="mt-5 text-3xl font-extrabold leading-[1.15] tracking-tight text-foreground sm:text-4xl lg:text-[3.1rem]">
+            {blog.title}
+          </h1>
+          <p className="mt-5 max-w-3xl text-base leading-relaxed text-muted sm:text-lg">
+            {blog.excerpt}
+          </p>
+        </header>
 
         {blog.cover_image_url ? (
-          <div className="mt-8 overflow-hidden rounded-2xl border border-card-border">
+          <div className="mt-8 overflow-hidden rounded-2xl border border-card-border shadow-[0_20px_50px_rgba(0,0,0,0.28)]">
             <Image
               src={blog.cover_image_url}
               alt={blog.title}
@@ -76,10 +81,12 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
         ) : null}
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-12">
-          <div
-            className="blog-content text-base leading-relaxed text-foreground [&_a]:text-accent [&_blockquote]:my-5 [&_blockquote]:border-l-2 [&_blockquote]:border-accent/50 [&_blockquote]:pl-4 [&_blockquote]:text-muted [&_em]:italic [&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:text-xl [&_h3]:font-bold [&_hr]:my-8 [&_hr]:border-card-border [&_img]:my-6 [&_img]:max-w-full [&_img]:rounded-xl [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mb-4 [&_strong]:font-bold [&_u]:underline [&_ul]:my-4 [&_ul]:list-disc [&_ul]:pl-5"
-            dangerouslySetInnerHTML={{ __html: blog.content }}
-          />
+          <div className="rounded-2xl border border-card-border bg-card/40 p-5 sm:p-7 lg:p-8">
+            <div
+              className="blog-content"
+              dangerouslySetInnerHTML={{ __html: blog.content }}
+            />
+          </div>
 
           <aside className="lg:sticky lg:top-28 lg:self-start">
             <BlogSideCards title="Recent Posts" blogs={recent} />
