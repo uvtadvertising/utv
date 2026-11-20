@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "UVT Advertising",
   description:
-    "Affordable digital marketing for Stoke-on-Trent and Staffordshire businesses. Websites, apps, design, SEO, and ads — all under one roof.",
+    "Affordable digital marketing for Stoke-on-Trent and Staffordshire businesses. Websites, apps, design, SEO, and ads - all under one roof.",
   url: "https://uvtadvertising.co.uk",
   nav: [
     { label: "Home", href: "/" },

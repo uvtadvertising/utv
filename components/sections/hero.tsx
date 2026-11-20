@@ -25,7 +25,7 @@ export function Hero() {
           </h1>
 
           <p className="mt-4 max-w-lg text-base leading-relaxed text-muted sm:text-[17px]">
-            Websites, apps, design, SEO, and ads — all under one roof. Big
+            Websites, apps, design, SEO, and ads - all under one roof. Big
             agency quality. Small business prices.
           </p>
 
