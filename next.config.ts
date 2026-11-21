@@ -14,6 +14,16 @@ const nextConfig: NextConfig = {
     return [
       { source: "/work", destination: "/portfolio", permanent: false },
       { source: "/insights", destination: "/portfolio", permanent: false },
+      {
+        source: "/community-digital-support",
+        destination: "/charity-digital-support-staffordshire",
+        permanent: false,
+      },
+      {
+        source: "/community-digital-support/",
+        destination: "/charity-digital-support-staffordshire",
+        permanent: false,
+      },
     ];
   },
 };

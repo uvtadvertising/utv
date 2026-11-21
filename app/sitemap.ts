@@ -8,6 +8,7 @@ const staticRoutes = [
   "/services",
   "/portfolio",
   "/blog",
+  "/charity-digital-support-staffordshire",
   "/faq",
   "/contact",
   "/stoke-on-trent",
