@@ -8,24 +8,62 @@ import { sendCommunityInterestEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
+const fieldLabels: Record<string, string> = {
+  organisationName: "Organisation name",
+  contactName: "Contact person’s name",
+  email: "Email address",
+  website: "Organisation website",
+  organisationType: "Organisation type",
+  location: "Where the organisation operates",
+  supportOption: "Preferred support option",
+  needs: "Brief explanation of what you need",
+  consent: "Consent checkbox",
+};
+
 const communitySchema = z.object({
-  organisationName: z.string().trim().min(2).max(150),
-  contactName: z.string().trim().min(2).max(100),
-  email: z.string().trim().email().max(254),
+  organisationName: z
+    .string()
+    .trim()
+    .min(2, "Organisation name must be at least 2 characters.")
+    .max(150, "Organisation name is too long."),
+  contactName: z
+    .string()
+    .trim()
+    .min(2, "Contact name must be at least 2 characters.")
+    .max(100, "Contact name is too long."),
+  email: z
+    .string()
+    .trim()
+    .email("Please enter a valid email address.")
+    .max(254, "Email address is too long."),
   website: z
     .string()
     .trim()
-    .max(300)
+    .max(300, "Website URL is too long.")
     .optional()
     .transform((value) => value || "")
     .refine((value) => !value || /^https?:\/\//i.test(value), {
       message: "Website must start with http:// or https://",
     }),
-  organisationType: z.enum(communityOrgTypes),
-  location: z.string().trim().min(2).max(200),
-  supportOption: z.enum(communitySupportOptions),
-  needs: z.string().trim().min(10).max(5000),
-  consent: z.literal(true),
+  organisationType: z.enum(communityOrgTypes, {
+    message: "Please select an organisation type.",
+  }),
+  location: z
+    .string()
+    .trim()
+    .min(2, "Location must be at least 2 characters.")
+    .max(200, "Location is too long."),
+  supportOption: z.enum(communitySupportOptions, {
+    message: "Please select a preferred support option.",
+  }),
+  needs: z
+    .string()
+    .trim()
+    .min(10, "Please write at least 10 characters explaining what you need.")
+    .max(5000, "Please keep your explanation under 5000 characters."),
+  consent: z.literal(true, {
+    message: "Please confirm the consent checkbox to continue.",
+  }),
   companyWebsite: z.string().optional().default(""),
 });
 
@@ -35,8 +73,25 @@ export async function POST(request: Request) {
     const result = communitySchema.safeParse(body);
 
     if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+
+      for (const issue of result.error.issues) {
+        const key = String(issue.path[0] || "");
+        if (!key || fieldErrors[key]) continue;
+        fieldErrors[key] = issue.message;
+      }
+
+      const messages = Object.entries(fieldErrors).map(([key, message]) => {
+        const label = fieldLabels[key] || key;
+        return `${label}: ${message}`;
+      });
+
       return NextResponse.json(
-        { success: false, message: "Please check your form fields." },
+        {
+          success: false,
+          message: messages[0] || "Please check your form fields.",
+          errors: fieldErrors,
+        },
         { status: 400 },
       );
     }
